@@ -20,7 +20,17 @@ Then open http://localhost:8000/ohmypcap.html in your browser.
 
 ## Docker
 
+### Pre-built Image
+
 ```bash
+mkdir -p ~/ohmypcap
+docker run -v ~/ohmypcap:/data -p 8000:8000 ghcr.io/dougburks/ohmypcap:main
+```
+
+### Build Your Own
+
+```bash
+mkdir -p ~/ohmypcap
 docker build -t ohmypcap .
 docker run -v ~/ohmypcap:/data -p 8000:8000 ohmypcap
 ```
