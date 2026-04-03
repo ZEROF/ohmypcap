@@ -13,7 +13,7 @@ docker run -v ~/ohmypcap:/data -p 8000:8000 ghcr.io/dougburks/ohmypcap:main
 
 Then open http://localhost:8000/ohmypcap.html in your browser.
 
-If you prefer not to use our pre-build Docker image, there are option shown below.
+If you prefer not to use our pre-build Docker image, then there are are options shown below.
 
 ## Usage
 
