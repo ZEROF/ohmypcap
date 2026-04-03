@@ -9,7 +9,7 @@ Most users will want to use our pre-built Docker image.
 If you don't already have Docker installed and are running [OhMyDebn](https://ohmydebn.org) or another Debian-based distro, then you can install Docker like this:
 
 ```bash
-sudo apt -y install docker
+sudo apt -y install docker.io
 ```
 
 Once you have Docker installed, all you have to do is:
