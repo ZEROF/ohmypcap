@@ -2,48 +2,18 @@
 
 A standalone web application for analyzing PCAP files using Suricata. View security alerts, browse network metadata (DNS, HTTP, TLS, flows), extract ASCII transcripts, and carve individual streams — all from a single-page UI.
 
-## Prerequisites
-
-- **Python 3** (stdlib only — no pip packages required)
-- **Suricata** — for PCAP analysis and rule-based alerting
-- **suricata-update** — for downloading/updating Suricata rules
-- **tcpdump** — for stream carving (`/api/download-stream`)
-- **tshark** — for ASCII transcript extraction (`/api/ascii-stream`)
-
 ## Quick Start
 
-```bash
-python3 ohmypcap.py
-```
-
-Then open http://localhost:8000/ohmypcap.html in your browser.
-
-## Docker
-
-### Pre-built Image
+Most users will want to use our pre-built Docker image. If you already have Docker installed, all you have to do is:
 
 ```bash
 mkdir -p ~/ohmypcap
 docker run -v ~/ohmypcap:/data -p 8000:8000 ghcr.io/dougburks/ohmypcap:main
 ```
 
-### Build Your Own
-
-```bash
-mkdir -p ~/ohmypcap
-docker build -t ohmypcap .
-docker run -v ~/ohmypcap:/data -p 8000:8000 ohmypcap
-```
-
 Then open http://localhost:8000/ohmypcap.html in your browser.
 
-### Environment Variables
-
-| Variable | Default | Description |
-|---|---|---|
-| `DATA_DIR` | `~/ohmypcap` | Directory for analyzed PCAPs and Suricata config |
-| `BIND_ADDRESS` | `127.0.0.1` | Address to bind the HTTP server to |
-| `PORT` | `8000` | HTTP server port |
+If you prefer not to use our pre-build Docker image, there are option shown below.
 
 ## Usage
 
@@ -86,6 +56,46 @@ All analyzed PCAPs are stored in `~/ohmypcap/`. Each analysis gets a subdirector
   events.db                  # SQLite index (auto-created after analysis)
   name.txt                   # Human-readable display name
 ```
+
+## Build Your Own Docker Image
+
+If you prefer to build your own Docker image, you can clone this github repo and then build the image:
+
+```bash
+git clone https://github.com/dougburks/ohmypcap ohmypcap-git
+cd ohmypcap-git
+docker build -t ohmypcap .
+mkdir -p ~/ohmypcap
+docker run -v ~/ohmypcap:/data -p 8000:8000 ohmypcap
+```
+
+Then open http://localhost:8000/ohmypcap.html in your browser.
+
+## Running without Docker
+
+If you prefer to run without docker, then you will need these prerequisites:
+
+- **Python 3** (stdlib only — no pip packages required)
+- **Suricata** — for PCAP analysis and rule-based alerting
+- **suricata-update** — for downloading/updating Suricata rules
+- **tcpdump** — for stream carving (`/api/download-stream`)
+- **tshark** — for ASCII transcript extraction (`/api/ascii-stream`)
+
+Once you have the preqequisites, then you can clone this github repo and run the server:
+```bash
+python3 ohmypcap.py
+```
+
+Then open http://localhost:8000/ohmypcap.html in your browser.
+
+### Environment Variables
+
+| Variable | Default | Description |
+|---|---|---|
+| `DATA_DIR` | `~/ohmypcap` | Directory for analyzed PCAPs and Suricata config |
+| `BIND_ADDRESS` | `127.0.0.1` | Address to bind the HTTP server to |
+| `PORT` | `8000` | HTTP server port |
+
 
 ## Configuration
 
@@ -132,4 +142,4 @@ python3 -m unittest discover -v
 
 ## License
 
-Copyright © Security Onion Solutions, LLC
+See [LICENSE](LICENSE)
