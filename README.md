@@ -17,8 +17,8 @@ newgrp docker
 Once Docker is installed and configured, all you have to do is create a directory and then run OhMyPCAP:
 
 ```bash
-mkdir -p ~/ohmypcap
-docker run -v ~/ohmypcap:/data -p 8000:8000 ghcr.io/dougburks/ohmypcap:main
+mkdir -p ~/ohmypcap-data
+docker run -v ~/ohmypcap-data:/data -p 8000:8000 ghcr.io/dougburks/ohmypcap:main
 ```
 
 OhMyPCAP will update its NIDS rules and then prompt you to open http://localhost:8000/ohmypcap.html in your browser.
@@ -55,10 +55,10 @@ Click any row in a data table to expand it, then:
 
 ## Data Storage
 
-All analyzed PCAPs are stored in `~/ohmypcap/`. Each analysis gets a subdirectory named by its MD5 hash containing:
+All analyzed PCAPs are stored in `~/ohmypcap-data/`. Each analysis gets a subdirectory named by its MD5 hash containing:
 
 ```
-~/ohmypcap/<md5>/
+~/ohmypcap-data/<md5>/
   <original-filename>.pcap   # The uploaded PCAP
   eve.json                   # Suricata's JSON output
   events.db                  # SQLite index (auto-created after analysis)
@@ -73,8 +73,8 @@ If you prefer to build your own Docker image, you can clone this github repo and
 git clone https://github.com/dougburks/ohmypcap ohmypcap-git
 cd ohmypcap-git
 docker build -t ohmypcap .
-mkdir -p ~/ohmypcap
-docker run -v ~/ohmypcap:/data -p 8000:8000 ohmypcap
+mkdir -p ~/ohmypcap-data
+docker run -v ~/ohmypcap-data:/data -p 8000:8000 ohmypcap
 ```
 
 Then open http://localhost:8000/ohmypcap.html in your browser.
@@ -100,7 +100,7 @@ Then open http://localhost:8000/ohmypcap.html in your browser.
 
 | Variable | Default | Description |
 |---|---|---|
-| `DATA_DIR` | `~/ohmypcap` | Directory for analyzed PCAPs and Suricata config |
+| `DATA_DIR` | `~/ohmypcap-data` | Directory for analyzed PCAPs and Suricata config |
 | `BIND_ADDRESS` | `127.0.0.1` | Address to bind the HTTP server to |
 | `PORT` | `8000` | HTTP server port |
 
@@ -110,7 +110,7 @@ Then open http://localhost:8000/ohmypcap.html in your browser.
 | Constant | Default | Description |
 |---|---|---|
 | `PORT` | `8000` | HTTP server port |
-| `BASE_DIR` | `~/ohmypcap` | Root directory for analyzed PCAPs |
+| `BASE_DIR` | `~/ohmypcap-data` | Root directory for analyzed PCAPs |
 | `MAX_UPLOAD_SIZE` | `1000 MB` | Maximum PCAP upload size |
 | `MAX_EVE_SIZE` | `1000 MB` | Maximum eve.json size |
 | `MAX_TRANSCRIPT_SIZE` | `100,000 chars` | Maximum ASCII transcript length |

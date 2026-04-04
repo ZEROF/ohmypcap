@@ -635,7 +635,7 @@ class TestPythonNoBareExcept(unittest.TestCase):
 
 class TestSuricataConfigRulesPath(unittest.TestCase):
     def test_suricata_yaml_uses_custom_rules_path(self):
-        suricata_dir = os.path.expanduser('~/ohmypcap/suricata')
+        suricata_dir = os.path.expanduser('~/ohmypcap-data/suricata')
         suricata_config = os.path.join(suricata_dir, 'suricata.yaml')
         
         # Skip if config doesn't exist (may not be set up yet)
@@ -646,7 +646,8 @@ class TestSuricataConfigRulesPath(unittest.TestCase):
             content = f.read()
         
         # Verify default-rule-path points to our custom directory
-        self.assertIn('/home/doug/ohmypcap/suricata/rules', content,
+        # Note: Inside Docker, DATA_DIR is mounted as /data
+        self.assertIn('/data/suricata/rules', content,
                       'suricata.yaml should use custom rules path')
         self.assertNotIn('/var/lib/suricata/rules', content,
                          'suricata.yaml should not use system rules path')

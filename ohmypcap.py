@@ -18,7 +18,7 @@ import shutil
 
 PORT = int(os.environ.get('PORT', 8000))
 BIND_ADDRESS = os.environ.get('BIND_ADDRESS', '127.0.0.1')
-DATA_DIR = os.environ.get('DATA_DIR', os.path.expanduser('~/ohmypcap'))
+DATA_DIR = os.environ.get('DATA_DIR', os.path.expanduser('~/ohmypcap-data'))
 MAX_TRANSCRIPT_SIZE = 100000
 MAX_UPLOAD_SIZE = 1000 * 1024 * 1024  # 1000MB
 MAX_EVE_SIZE = 1000 * 1024 * 1024  # 1000MB

@@ -13,7 +13,7 @@ Browser ──HTTP──▶ ohmypcap.py (Python HTTP server, port 8000)
                       └──▶ tshark (extracts ASCII transcripts)
 ```
 
-All state is file-based under `~/ohmypcap/`. No database server, no external services.
+All state is file-based under `~/ohmypcap-data/`. No database server, no external services.
 
 ## Server (ohmypcap.py)
 
@@ -30,7 +30,7 @@ A stdlib-only Python HTTP server (`http.server.SimpleHTTPRequestHandler`). Handl
 ### Data Storage
 
 ```
-~/ohmypcap/
+~/ohmypcap-data/
   suricata/
     suricata.yaml          # Copied from /etc/suricata/, rule path rewritten
     rules/
