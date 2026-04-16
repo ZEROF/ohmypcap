@@ -673,15 +673,18 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                             except Exception:
                                 pass
                     
-                    proc = subprocess.Popen(
-                        ['suricata', '-r', pcap_path, '-c', os.path.join(SURICATA_DIR, 'suricata.yaml'), '-k', 'none', '--runmode', 'single'],
-                        cwd=dir_path,
-                        stdout=subprocess.DEVNULL,
-                        stderr=subprocess.DEVNULL
-                    )
-                    
-                    import threading
-                    threading.Thread(target=lambda: (proc.wait(), on_suricata_done()), daemon=True).start()
+                    try:
+                        proc = subprocess.Popen(
+                            ['suricata', '-r', pcap_path, '-c', os.path.join(SURICATA_DIR, 'suricata.yaml'), '-k', 'none', '--runmode', 'single'],
+                            cwd=dir_path,
+                            stdout=subprocess.DEVNULL,
+                            stderr=subprocess.DEVNULL
+                        )
+                        
+                        import threading
+                        threading.Thread(target=lambda: (proc.wait(), on_suricata_done()), daemon=True).start()
+                    except Exception:
+                        pass
                 else:
                     self.send_response(200)
                     self.send_header('Content-Type', 'application/json')
@@ -790,15 +793,18 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                         except Exception:
                             pass
                 
-                proc = subprocess.Popen(
-                    ['suricata', '-r', pcap_path, '-c', os.path.join(SURICATA_DIR, 'suricata.yaml'), '-k', 'none', '--runmode', 'single'],
-                    cwd=dir_path,
-                    stdout=subprocess.DEVNULL,
-                    stderr=subprocess.DEVNULL
-                )
-                
-                import threading
-                threading.Thread(target=lambda: (proc.wait(), on_suricata_done()), daemon=True).start()
+                try:
+                    proc = subprocess.Popen(
+                        ['suricata', '-r', pcap_path, '-c', os.path.join(SURICATA_DIR, 'suricata.yaml'), '-k', 'none', '--runmode', 'single'],
+                        cwd=dir_path,
+                        stdout=subprocess.DEVNULL,
+                        stderr=subprocess.DEVNULL
+                    )
+                    
+                    import threading
+                    threading.Thread(target=lambda: (proc.wait(), on_suricata_done()), daemon=True).start()
+                except Exception:
+                    pass
 
                 self.send_response(200)
                 self.send_header('Content-Type', 'application/json')
@@ -825,11 +831,14 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 self._send_error(400, 'Invalid path')
                 return
             eve_path = os.path.join(dir_path, 'eve.json')
+            db_file = os.path.join(dir_path, 'events.db')
             pcap_files = [f for f in os.listdir(dir_path) if f.endswith(PCAP_EXTENSIONS)] if os.path.exists(dir_path) else []
             pcap_path = os.path.join(dir_path, pcap_files[0]) if pcap_files else None
 
             is_ready = False
-            if os.path.exists(eve_path):
+            if os.path.exists(db_file):
+                is_ready = True
+            elif os.path.exists(eve_path):
                 try:
                     file_size = os.path.getsize(eve_path)
                     if file_size > 10:

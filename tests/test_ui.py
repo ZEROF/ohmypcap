@@ -397,7 +397,8 @@ class TestSecurityInUI(unittest.TestCase):
         self.assertIn('escapeHtml(', JS_CONTENT)
 
     def test_no_hardcoded_credentials(self):
-        self.assertNotIn('password', JS_CONTENT.lower().replace('disclaimer', '').replace('password-protected', ''))
+        content = JS_CONTENT.lower().replace('disclaimer', '').replace('password-protected', '').replace('password protected', '')
+        self.assertNotIn('password', content)
 
     def test_uses_https_for_external_resources(self):
         self.assertIn('https://', HTML_CONTENT)

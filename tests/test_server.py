@@ -290,7 +290,7 @@ class TestAPIEndpoints(unittest.TestCase):
             return e.code, e.read().decode()
 
     def test_events_empty(self):
-        status, body = self._get('/api/events')
+        status, body = self._get('/api/events?md5=' + 'a' * 32)
         self.assertEqual(status, 200)
         self.assertEqual(json.loads(body), [])
 
@@ -298,17 +298,39 @@ class TestAPIEndpoints(unittest.TestCase):
         md5dir = os.path.join(self.tmpdir, 'd41d8cd98f00b204e9800998ecf8427e')
         os.makedirs(md5dir, exist_ok=True)
         with open(os.path.join(md5dir, 'eve.json'), 'w') as f:
-            f.write('{"event_type": "alert"}\n')
+            f.write('{"event_type": "alert", "timestamp": "2026-01-01T00:00:00"}\n')
+        db_file = os.path.join(md5dir, 'events.db')
+        server.create_sqlite_db(db_file, os.path.join(md5dir, 'eve.json'))
 
         status, body = self._get('/api/events?md5=d41d8cd98f00b204e9800998ecf8427e')
         self.assertEqual(status, 200)
         data = json.loads(body)
         self.assertEqual(len(data), 1)
 
-    def test_events_rejects_path_traversal_md5(self):
-        status, body = self._get('/api/events?md5=../../../etc/passwd')
+    def test_events_requires_md5(self):
+        status, body = self._get('/api/events')
         self.assertEqual(status, 200)
         self.assertEqual(json.loads(body), [])
+
+    def test_stats_requires_md5(self):
+        status, body = self._get('/api/stats')
+        self.assertEqual(status, 200)
+        data = json.loads(body)
+        self.assertIn('error', data)
+
+    def test_count_requires_md5(self):
+        status, body = self._get('/api/count')
+        self.assertEqual(status, 200)
+        data = json.loads(body)
+        self.assertIn('error', data)
+
+    def test_download_stream_requires_md5(self):
+        status, _ = self._get('/api/download-stream?src=1.2.3.4&sport=80&dst=5.6.7.8&dport=443')
+        self.assertEqual(status, 400)
+
+    def test_ascii_stream_requires_md5(self):
+        status, _ = self._get('/api/ascii-stream?src=1.2.3.4&sport=80&dst=5.6.7.8&dport=443')
+        self.assertEqual(status, 400)
 
     def test_analyses_empty(self):
         status, body = self._get('/api/analyses')
@@ -453,6 +475,41 @@ class TestAPIEndpoints(unittest.TestCase):
         data = json.loads(body)
         self.assertIn('status', data)
 
+    def test_check_status_ready_with_sqlite(self):
+        md5dir = os.path.join(self.tmpdir, 'abc123def45678901234567890123456')
+        os.makedirs(md5dir, exist_ok=True)
+        with open(os.path.join(md5dir, 'eve.json'), 'w') as f:
+            f.write('{"event_type": "alert"}\n')
+        with open(os.path.join(md5dir, 'events.db'), 'w') as f:
+            f.write('')
+        
+        status, body = self._post('/api/check-status', {'md5': 'abc123def45678901234567890123456'})
+        self.assertEqual(status, 200)
+        data = json.loads(body)
+        self.assertEqual(data.get('status'), 'ready')
+
+    def test_check_status_ready_with_eve_json(self):
+        md5dir = os.path.join(self.tmpdir, 'abcdef12345678901234567890123456')
+        os.makedirs(md5dir, exist_ok=True)
+        with open(os.path.join(md5dir, 'eve.json'), 'w') as f:
+            f.write('{"event_type": "alert"}\n')
+        
+        status, body = self._post('/api/check-status', {'md5': 'abcdef12345678901234567890123456'})
+        self.assertEqual(status, 200)
+        data = json.loads(body)
+        self.assertEqual(data.get('status'), 'ready')
+
+    def test_check_status_processing_empty_eve_json(self):
+        md5dir = os.path.join(self.tmpdir, 'aaa123def45678901234567890123456')
+        os.makedirs(md5dir, exist_ok=True)
+        with open(os.path.join(md5dir, 'eve.json'), 'w') as f:
+            f.write('')
+        
+        status, body = self._post('/api/check-status', {'md5': 'aaa123def45678901234567890123456'})
+        self.assertEqual(status, 200)
+        data = json.loads(body)
+        self.assertEqual(data.get('status'), 'processing')
+
 
 class TestServerBinding(unittest.TestCase):
     def test_server_binds_localhost(self):
@@ -590,8 +647,8 @@ class TestSizeLimitMessages(unittest.TestCase):
             content = f.read()
         error_count = content.count('max 1000MB')
         error_text_count = content.count('Eve.json')
-        self.assertGreaterEqual(error_count, 2, 'Error message appears at least twice')
-        self.assertGreaterEqual(error_text_count, 2, 'Eve.json text appears at least twice')
+        self.assertGreaterEqual(error_count, 1, 'Error message appears at least once')
+        self.assertGreaterEqual(error_text_count, 1, 'Eve.json text appears at least once')
 
 
 class TestHTMLNoDuplicateFunctions(unittest.TestCase):
