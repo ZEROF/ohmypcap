@@ -24,12 +24,6 @@ MAX_UPLOAD_SIZE = 1000 * 1024 * 1024  # 1000MB
 MAX_EVE_SIZE = 1000 * 1024 * 1024  # 1000MB
 SURICATA_DIR = os.path.join(DATA_DIR, 'suricata')
 SURICATA_RULES_DIR = os.path.join(SURICATA_DIR, 'rules')
-RATE_LIMIT_SECONDS = 0.01
-RATE_LIMIT_WINDOW = {}
-RATE_LIMIT_COUNT = {}
-RATE_LIMIT_MAX_REQUESTS = 100
-RATE_LIMIT_WINDOW_SIZE = 1
-
 ALLOWED_URL_SCHEMES = ('http', 'https')
 BLOCKED_HOSTS = ('localhost', '127.0.0.1', '0.0.0.0', '::1')
 BLOCKED_NETWORKS = [
@@ -137,9 +131,6 @@ def is_safe_path(base, path):
     real_base = os.path.realpath(base)
     real_path = os.path.realpath(path)
     return real_path.startswith(real_base + os.sep) or real_path == real_base
-
-def check_rate_limit(client_ip):
-    return True
 
 def validate_url_safety(url):
     parsed = urlparse(url)
@@ -271,9 +262,6 @@ class Handler(http.server.SimpleHTTPRequestHandler):
     def log_message(self, format, *args):
         pass
 
-    def _get_client_ip(self):
-        return self.client_address[0]
-
     def _send_error(self, code, message):
         self.send_response(code)
         self.send_header('Content-Type', 'application/json')
@@ -297,10 +285,6 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         if path == '/favicon.ico':
             self.send_response(204)
             self.end_headers()
-            return
-
-        if not check_rate_limit(self._get_client_ip()):
-            self._send_error(429, 'Rate limited')
             return
 
         if path == '/api/events':
@@ -651,10 +635,6 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
     def do_POST(self):
         global current_pcap_file, current_eve_file
-
-        if not check_rate_limit(self._get_client_ip()):
-            self._send_error(429, 'Rate limited')
-            return
 
         if self.path == '/api/upload':
             content_length = int(self.headers.get('Content-Length', 0))

@@ -208,24 +208,7 @@ class TestPcapContentValidation(unittest.TestCase):
 
 
 class TestRateLimiting(unittest.TestCase):
-    def setUp(self):
-        server.RATE_LIMIT_WINDOW.clear()
-
-    def test_first_request_allowed(self):
-        self.assertTrue(server.check_rate_limit('1.2.3.4'))
-
-    def test_rapid_requests_allowed(self):
-        self.assertTrue(server.check_rate_limit('1.2.3.4'))
-        self.assertTrue(server.check_rate_limit('1.2.3.4'))
-
-    def test_different_ips_independent(self):
-        self.assertTrue(server.check_rate_limit('1.2.3.4'))
-        self.assertTrue(server.check_rate_limit('5.6.7.8'))
-
-    def test_rate_limit_expires(self):
-        self.assertTrue(server.check_rate_limit('1.2.3.4'))
-        server.RATE_LIMIT_WINDOW['1.2.3.4'] = time.time() - 2
-        self.assertTrue(server.check_rate_limit('1.2.3.4'))
+    pass
 
 
 class TestMD5Validation(unittest.TestCase):
@@ -261,7 +244,6 @@ class TestAPIEndpoints(unittest.TestCase):
         shutil.rmtree(cls.tmpdir, ignore_errors=True)
 
     def setUp(self):
-        server.RATE_LIMIT_WINDOW.clear()
         time.sleep(0.05)
 
     def _get(self, path):
