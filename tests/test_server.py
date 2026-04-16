@@ -312,6 +312,33 @@ class TestAPIEndpoints(unittest.TestCase):
         self.assertEqual(status, 200)
         self.assertEqual(json.loads(body), [])
 
+    def test_events_invalid_limit(self):
+        md5 = 'a' * 32
+        status, body = self._get(f'/api/events?md5={md5}&limit=abc')
+        self.assertEqual(status, 200)
+        self.assertEqual(json.loads(body), [])
+
+    def test_events_invalid_offset(self):
+        md5 = 'a' * 32
+        status, body = self._get(f'/api/events?md5={md5}&offset=xyz')
+        self.assertEqual(status, 200)
+        self.assertEqual(json.loads(body), [])
+
+    def test_events_negative_limit(self):
+        md5 = 'a' * 32
+        status, body = self._get(f'/api/events?md5={md5}&limit=-1')
+        self.assertEqual(status, 200)
+
+    def test_events_negative_offset(self):
+        md5 = 'a' * 32
+        status, body = self._get(f'/api/events?md5={md5}&offset=-5')
+        self.assertEqual(status, 200)
+
+    def test_events_zero_limit(self):
+        md5 = 'a' * 32
+        status, body = self._get(f'/api/events?md5={md5}&limit=0')
+        self.assertEqual(status, 200)
+
     def test_stats_requires_md5(self):
         status, body = self._get('/api/stats')
         self.assertEqual(status, 200)

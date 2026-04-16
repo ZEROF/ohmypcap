@@ -309,12 +309,19 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             if not is_safe_path(DATA_DIR, dir_path):
                 self.wfile.write(b'[]')
                 return
-            db_file = os.path.join(dir_path, 'events.db')
+            
+            try:
+                offset = int(params.get('offset', ['0'])[0])
+                limit = int(params.get('limit', ['1000'])[0])
+            except ValueError:
+                self.wfile.write(b'[]')
+                return
 
-            offset = int(params.get('offset', ['0'])[0])
-            limit = int(params.get('limit', ['1000'])[0])
-            limit = min(limit, 5000)
+            offset = max(0, offset)
+            limit = max(1, min(limit, 5000))
             event_type = params.get('type', [''])[0] or None
+            
+            db_file = os.path.join(dir_path, 'events.db')
 
             if db_file and os.path.exists(db_file):
                 events = query_events_sqlite(db_file, event_type, offset, limit)
