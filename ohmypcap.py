@@ -15,6 +15,7 @@ import time
 import socket
 import sqlite3
 import shutil
+import sys
 
 PORT = int(os.environ.get('PORT', 8000))
 BIND_ADDRESS = os.environ.get('BIND_ADDRESS', '127.0.0.1')
@@ -35,6 +36,16 @@ BLOCKED_NETWORKS = [
     ipaddress.ip_network('::1/128'),
     ipaddress.ip_network('fd00::/8'),
 ]
+
+REQUIRED_EXECUTABLES = ['tcpdump', 'tshark', 'suricata', 'suricata-update']
+
+def check_executables():
+    """Check all required executables exist. Returns list of missing tools."""
+    missing = []
+    for tool in REQUIRED_EXECUTABLES:
+        if shutil.which(tool) is None:
+            missing.append(tool)
+    return missing
 
 os.makedirs(DATA_DIR, exist_ok=True)
 
@@ -871,6 +882,13 @@ if __name__ == '__main__':
     script_dir = os.path.dirname(os.path.abspath(__file__))
     html_path = os.path.join(script_dir, 'ohmypcap.html')
     os.chdir(script_dir)
+    
+    # Check for required executables
+    missing = check_executables()
+    if missing:
+        print(f"Error: Missing required executables: {', '.join(missing)}")
+        print("Please install them and try again.")
+        sys.exit(1)
     
     # Run setup - handles rules download first
     setup_suricata_config()

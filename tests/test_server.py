@@ -772,5 +772,33 @@ class TestEnvironmentVariables(unittest.TestCase):
         self.assertEqual(server.PORT, 8000)
 
 
+class TestExecutableChecks(unittest.TestCase):
+    def test_check_executables_returns_list(self):
+        result = server.check_executables()
+        self.assertIsInstance(result, list)
+
+    def test_required_executables_defined(self):
+        self.assertIn('tcpdump', server.REQUIRED_EXECUTABLES)
+        self.assertIn('tshark', server.REQUIRED_EXECUTABLES)
+        self.assertIn('suricata', server.REQUIRED_EXECUTABLES)
+        self.assertIn('suricata-update', server.REQUIRED_EXECUTABLES)
+
+    @unittest.mock.patch('ohmypcap.shutil.which')
+    def test_check_executables_all_missing(self, mock_which):
+        mock_which.return_value = None
+        missing = server.check_executables()
+        self.assertEqual(len(missing), 4)
+
+    @unittest.mock.patch('ohmypcap.shutil.which')
+    def test_check_executables_some_present(self, mock_which):
+        def which_side_effect(cmd):
+            if cmd in ['tcpdump', 'tshark']:
+                return f'/usr/bin/{cmd}'
+            return None
+        mock_which.side_effect = which_side_effect
+        missing = server.check_executables()
+        self.assertEqual(sorted(missing), ['suricata', 'suricata-update'])
+
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)
