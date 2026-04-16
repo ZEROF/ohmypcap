@@ -2,7 +2,18 @@
 
 A standalone web application for analyzing PCAP files using Suricata. View security alerts, browse network metadata (DNS, HTTP, TLS, flows), extract ASCII transcripts, and carve individual streams — all from a single-page UI.
 
-## Quick Start
+## Quick Demo
+
+The fastest way to try OhMyPCAP is with our online demo:
+
+https://killercoda.com/ohmypcap/scenario/ohmypcap
+
+Please note the following:
+- this is a cloud based service so please do not share any sensitive PCAP files or any other sensitive info
+- free accounts are limited to 60 minutes of usage before the instance is automatically terminated
+- if you need a private or permanent instance of OhMyPCAP, then please see the other options below
+
+## Quick Installation
 
 Most folks will want to use our pre-built Docker image. If you prefer not to use our pre-built Docker image, then there are other options shown [below](#build-your-own-docker-image).
 
